@@ -24,7 +24,7 @@ signal RAM: ram_type := (0 => std_logic_vector(to_unsigned( 4 , 8)),
                          1 => std_logic_vector(to_unsigned( 13 , 8)),
                          2 => std_logic_vector(to_unsigned( 22 , 8)),
                          3 => std_logic_vector(to_unsigned( 31 , 8)),
-                         4 => std_logic_vector(to_unsigned( 37 , 8)),
+                         4 => std_logic_vector(to_unsigned( 40 , 8)),
                          5 => std_logic_vector(to_unsigned( 45 , 8)),
                          6 => std_logic_vector(to_unsigned( 77 , 8)),
                          7 => std_logic_vector(to_unsigned( 91 , 8)),
@@ -98,7 +98,7 @@ begin
     wait until tb_done = '0';
 
     -- Maschera di output = 0 - 42
-    assert RAM(9) = std_logic_vector(to_unsigned( 42 , 8)) report "TEST FALLITO. Expected  42  found " & integer'image(to_integer(unsigned(RAM(9))))  severity failure;
+    assert RAM(9) = std_logic_vector(to_unsigned( 196 , 8)) report "TEST FALLITO. Expected  42  found " & integer'image(to_integer(unsigned(RAM(9))))  severity failure;
  
     assert false report "Simulation Ended!, TEST PASSATO" severity failure;
 end process test;

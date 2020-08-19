@@ -47,7 +47,7 @@ end project_reti_logiche;
 
 architecture Behavioral of project_reti_logiche is
 
-type state_type is (START_STATE, WAITING_ADDRESS, READING_ADDRESS, WAITING_STATE, READ_DATA, CALC_DATA, WRITE_OUT);
+type state_type is (START_STATE, WAITING_ADDRESS, READING_ADDRESS, WAITING_STATE, READ_DATA, CALC_DATA, FOUND, NOT_FOUND, FINISHED);
 
 signal state : state_type;
 
@@ -59,8 +59,8 @@ signal address0 : std_logic_vector(7 downto 0);
 signal address1 : std_logic_vector(7 downto 0);
 signal address2 : std_logic_vector(7 downto 0);
 signal address3 : std_logic_vector(7 downto 0);
+signal offset : std_logic_vector(3 downto 0);
 
-signal found : std_logic;
  -- SIGNALS --
 begin
 	
@@ -79,7 +79,7 @@ begin
 					if(i_start='1') then
 						o_en <= '1';
 						o_we <= '0';
-						o_address <= (0 =>'1',1 =>'1',2 =>'1', others => '0');
+						o_address <= (0 =>'0',1 =>'0',2 =>'0',3 =>'1', others => '0');
 						state <= WAITING_ADDRESS;
 					end if;
 				when WAITING_ADDRESS =>
@@ -104,20 +104,19 @@ begin
 					state <= CALC_DATA;
 				when CALC_DATA =>
 					if(address0 = address_to_code) then
-						found <= '1';
-						state <= WRITE_OUT;
+						offset <= "0001";
+						state <= FOUND;
 					elsif (address1 = address_to_code) then
-						found <= '1';
-						state <= WRITE_OUT;
+						offset <= "0010";
+						state <= FOUND;
 					elsif (address2 = address_to_code) then
-						found <= '1';
-						state <= WRITE_OUT; 
+						offset <= "0100";
+						state <= FOUND;
 					elsif (address3 = address_to_code) then
-						found <= '1';
-						state <= WRITE_OUT;
-					elsif (counter > 7) then
-						found <= '0';
-						state <= WRITE_OUT;
+						offset <= "1000";
+						state <= FOUND;
+					elsif (counter > 6) then
+						state <= NOT_FOUND;
 					else 
 						counter <= counter + 1; 
 						o_en <= '1';
@@ -125,8 +124,27 @@ begin
 						o_address <= std_logic_vector(to_unsigned(counter+1,o_address'length));
 						state <= WAITING_STATE;
 					end if;
-				when WRITE_OUT =>
-				
+				when FOUND =>
+					o_en <= '1';
+					o_we <= '1';
+					o_address <= (0 =>'1',1 =>'0',2 =>'0',3 =>'1', others => '0');
+					o_data <= '1' & std_logic_vector(to_unsigned(counter,3)) & offset;
+					o_done <= '1';
+					state <= FINISHED;
+				when NOT_FOUND =>
+					o_en <= '1';
+					o_we <= '1';
+					o_address <= (0 =>'1',1 =>'0',2 =>'0',3 =>'1', others => '0');
+					o_data <= address_to_code;
+					o_done <= '1';
+					state <= FINISHED;
+				when FINISHED =>
+					if(i_start = '0') then
+						state <= START_STATE;
+						o_done <= '0';
+						counterVector <= "0000";
+						counter <= 0;
+					end if;
 			end case;
 		end if;
 	end process;
