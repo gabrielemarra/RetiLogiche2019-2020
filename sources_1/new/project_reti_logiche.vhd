@@ -26,10 +26,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
+use ieee.std_logic_unsigned.all;
 
 entity project_reti_logiche is
 	port (
@@ -47,7 +44,7 @@ end project_reti_logiche;
 
 architecture Behavioral of project_reti_logiche is
 
-type state_type is (START_STATE, WAITING_ADDRESS, READING_ADDRESS, WAITING_STATE, READ_DATA, CALC_DATA, FOUND, NOT_FOUND, FINISHED);
+type state_type is (START_STATE, WAITING_ADDRESS, READING_ADDRESS, WAITING_STATE, WZ_ANALYSIS, FOUND, NOT_FOUND, FINISHED);
 
 signal state : state_type;
 
@@ -55,10 +52,6 @@ signal address_read : std_logic_vector(7 downto 0);
 signal counterVector : std_logic_vector(3 downto 0);
 signal counter : integer;
 signal address_to_code : std_logic_vector(7 downto 0);
-signal address0 : std_logic_vector(7 downto 0);
-signal address1 : std_logic_vector(7 downto 0);
-signal address2 : std_logic_vector(7 downto 0);
-signal address3 : std_logic_vector(7 downto 0);
 signal offset : std_logic_vector(3 downto 0);
 
  -- SIGNALS --
@@ -72,7 +65,6 @@ begin
 			o_done <= '0';
 			counterVector <= "0000";
 			counter <= 0;
-			-- todo--
 		elsif rising_edge(i_clk) then
 			case state is
 				when START_STATE =>
@@ -91,31 +83,25 @@ begin
 					address_to_code <= i_data;
 					o_en <= '0';
 					o_we <= '0';
-					state <= READ_DATA;
+					state <= WZ_ANALYSIS;
 				when WAITING_STATE =>
 					o_en <= '0';
 					o_we <= '0';
-					state <= READ_DATA;
-				when READ_DATA =>
-					address0 <= i_data;
-					address1 <= std_logic_vector(unsigned(i_data)+"01");
-					address2 <= std_logic_vector(unsigned(i_data)+"10");
-					address3 <= std_logic_vector(unsigned(i_data)+"11");
-					state <= CALC_DATA;
-				when CALC_DATA =>
-					if(address0 = address_to_code) then
+					state <= WZ_ANALYSIS;
+				when WZ_ANALYSIS =>
+					if(i_data = address_to_code) then
 						offset <= "0001";
 						state <= FOUND;
-					elsif (address1 = address_to_code) then
+					elsif ( i_data+1 = address_to_code) then
 						offset <= "0010";
 						state <= FOUND;
-					elsif (address2 = address_to_code) then
+					elsif ( i_data+2 = address_to_code) then
 						offset <= "0100";
 						state <= FOUND;
-					elsif (address3 = address_to_code) then
+					elsif ( i_data+3 = address_to_code) then
 						offset <= "1000";
 						state <= FOUND;
-					elsif (counter > 6) then
+					elsif (counter > ) then
 						state <= NOT_FOUND;
 					else 
 						counter <= counter + 1; 
