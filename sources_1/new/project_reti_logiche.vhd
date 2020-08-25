@@ -101,7 +101,7 @@ begin
 					elsif ( i_data+3 = address_to_code) then
 						offset <= "1000";
 						state <= FOUND;
-					elsif (counter > ) then
+					elsif (counter > 6) then
 						state <= NOT_FOUND;
 					else 
 						counter <= counter + 1; 
