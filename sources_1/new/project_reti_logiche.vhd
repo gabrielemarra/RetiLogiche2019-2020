@@ -70,6 +70,7 @@ begin
 					o_we <= '0';
 					state <= WZ_ANALYSIS;
 				when WZ_ANALYSIS =>
+					-- i_data contiene l'indirizzo base della WZ --
 					if(i_data = address_to_code) then
 						wz_offset <= "0001";
 						state <= FOUND;
@@ -83,6 +84,7 @@ begin
 						wz_offset <= "1000";
 						state <= FOUND;
 					elsif (wz_num > 6) then
+						-- wz_num > 6 perche' non e' ancora stato incrementato l'ultima volta, ma e' comunque l'ultima WZ --
 						state <= NOT_FOUND;
 					else 
 						wz_num <= wz_num + 1; 
@@ -102,6 +104,10 @@ begin
 					o_en <= '1';
 					o_we <= '1';
 					o_address <= (0 =>'1',1 =>'0',2 =>'0',3 =>'1', others => '0');
+					
+					-- Non e' necessario concatenare WZ_BIT (0) con address_to_code poiche' --
+					-- quest'ultimo ha gia' il bit piu' significativo posto a 0 --
+					
 					o_data <= address_to_code;
 					o_done <= '1';
 					state <= FINISHED;
