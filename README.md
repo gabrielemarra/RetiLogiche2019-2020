@@ -2,7 +2,7 @@
 Prova finale del corso Reti Logiche al Politecnico di Milano (A.A. 2019/2020)
 <br>
 <br>
-Final score was ***30/ 30*** (A)
+Voto finale ***30/ 30***
 ## Group members
 - **Gabriele Marra** ([@gabrielemarra](https://github.com/gabrielemarra)) <br>
 - **Matteo Miceli** ([@micelimatteo](https://github.com/micelimatteo)) <br>
